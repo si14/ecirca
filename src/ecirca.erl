@@ -1,21 +1,36 @@
 -module(ecirca).
--export([init/0, update/2, hex/1]).
+-export([new/1,
+         set/3,
+         get/2,
+         push/2,
+         slice/3]).
 
 -on_load(nif_init/0).
 
 -define(APPNAME, ?MODULE).
 -define(LIBNAME, ?MODULE).
+-define(NULLVAL, 16#FFFFFFFFFFFFFFFF).
 
+-type res() :: any().
 
-init() ->
-    not_loaded(?LINE).
+-spec new(pos_integer()) -> res().
+new(_Size) -> not_loaded(?LINE).
 
-update(_Ctx, _Data) ->
-    not_loaded(?LINE).
+-spec set(res(), pos_integer(), pos_integer()) -> {ok, res()}.
+set(_Res, _I, _Val) -> not_loaded(?LINE).
 
-hex(_Ctx) ->
-    not_loaded(?LINE).
+-spec get(res(), pos_integer()) -> {ok, pos_integer()} |
+                                   {error, not_found}.
+get(_Res, _I) -> not_loaded(?LINE).
 
+-spec push(res(), pos_integer()) -> {ok, res()}.
+push(_Res, _Val) -> not_loaded(?LINE).
+
+-spec slice(res(), pos_integer(), pos_integer()) -> [pos_integer()].
+slice(_Res, _Start, _End) -> not_loaded(?LINE).
+
+%% @doc Loads a NIF
+-spec nif_init() -> ok | {error, _}.
 nif_init() ->
     SoName = case code:priv_dir(?APPNAME) of
         {error, bad_name} ->
@@ -29,7 +44,6 @@ nif_init() ->
             filename:join(Dir, ?MODULE)
     end,
     erlang:load_nif(SoName, 0).
-
 
 not_loaded(Line) ->
     exit({not_loaded, [{module, ?MODULE}, {line, Line}]}).
