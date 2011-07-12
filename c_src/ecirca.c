@@ -30,7 +30,7 @@ new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     ERL_NIF_TERM ret;
     int size;
     
-    if (argc != 1 || !enif_get_int(env, argv[0], &size) {
+    if (argc != 1 || !enif_get_int(env, argv[0], &size)) {
         return enif_make_badarg(env);
     }
     if (size > MAXSIZE || size <= 0) {
