@@ -1,1 +1,1 @@
-This a circular arrays for Erlang
+This a circular arrays for Erlang.
