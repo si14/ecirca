@@ -4,6 +4,7 @@
          get/2,
          push/2,
          slice/3]).
+-export([start/0]).
 
 -on_load(nif_init/0).
 
@@ -48,4 +49,8 @@ nif_init() ->
 not_loaded(Line) ->
     exit({not_loaded, [{module, ?MODULE}, {line, Line}]}).
 
+start() ->
+    T = circa:new(5),
+    [circa:push(T, X) || X <- [1, 2, 3, 4]],
+    [io:format("~snd elem: ~p", [X, circa:get(T, X)]) || X <- [1, 2, 3, 4, 5]].
 
