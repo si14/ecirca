@@ -3,4 +3,5 @@
 *.beam
 ebin/
 deps/
-.so
+*.o
+*.so
