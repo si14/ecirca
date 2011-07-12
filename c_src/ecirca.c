@@ -9,6 +9,8 @@
 typedef struct {
     uint32_t    begin;
 	uint64_t    *circa;
+    uint32_t    size;
+    bool        filled;
 } circactx;
 
 ErlNifResourceType* circa_type;
@@ -38,7 +40,10 @@ new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     }
 
     circactx* ctx = enif_alloc_resource(circa_type, sizeof(circactx));
-    ctx->circa = enif_alloc(sizeof(uint64_t) * size);
+    ctx->begin  = -1;
+    ctx->circa  = enif_alloc(sizeof(uint64_t) * size);
+    ctx->size   = size;
+    ctx->filled = FALSE;
     
     ret = enif_make_resource(env, ctx);
     enif_release_resource(ctx);
@@ -46,11 +51,17 @@ new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     return ret;
 }
 
+//push function
+static ERL_NIF_TERM
+push(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+    
+}
 
 //functions
 static ErlNifFunc functions[] =
 {
-    {"new", 1, new}
+    {"new", 1, new},
+    {"push", 2, push},
 };
 
 ERL_NIF_INIT(ecirca, functions, &load, NULL, NULL, NULL);
