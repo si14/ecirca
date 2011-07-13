@@ -1,1 +1,1 @@
-This a circular arrays for Erlang.
+All active development is made in https://github.com/band115/ecirca
