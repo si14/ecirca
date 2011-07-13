@@ -98,21 +98,22 @@ get(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
                                      enif_make_atom(env, "not_found"));
     }
     
-    if (i > ctx->begin) {
-        idx = ctx->size + ctx->begin - i;
+    if (i > ctx->begin + 1) {
+        idx = ctx->size + ctx->begin - i + 1;
     } else {
-        idx = ctx->begin - i;
+        idx = ctx->begin - i + 1;
     }
     
     /*return enif_make_tuple2(env, enif_make_atom(env, "ok"), 
                                  ERL_MAKE_ELEM(env, ctx->circa[idx]));*/
-    return enif_make_tuple7(env, enif_make_atom(env, "ok"), 
+    return enif_make_tuple8(env, enif_make_atom(env, "ok"), 
                                  ERL_MAKE_ELEM(env, ctx->circa[0]),
                                  ERL_MAKE_ELEM(env, ctx->circa[1]),
                                  ERL_MAKE_ELEM(env, ctx->circa[2]),
                                  ERL_MAKE_ELEM(env, ctx->circa[3]),
                                  ERL_MAKE_ELEM(env, ctx->circa[4]),
-                                 ERL_MAKE_ELEM(env, ctx->filled));
+                                 ERL_MAKE_ELEM(env, ctx->filled),
+                                 ERL_MAKE_ELEM(env, ctx->circa[idx]));
 }
 
 //functions
