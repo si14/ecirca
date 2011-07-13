@@ -34,7 +34,7 @@
 /* data structure */
 typedef struct {
     SIZE_TYPE           begin;
-	ELEM_TYPE           *circa;
+    ELEM_TYPE           *circa;
     SIZE_TYPE           size;
     unsigned short int  filled;
 } circactx;
@@ -56,9 +56,9 @@ SIZE_TYPE getIndex(circactx* ctx, SIZE_TYPE i) {
 /* creating resource type on load */
 static int
 load(ErlNifEnv* env, void** priv, ERL_NIF_TERM info) {
-	int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
+    int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
 
-	circa_type = enif_open_resource_type(env, NULL, "circa",
+    circa_type = enif_open_resource_type(env, NULL, "circa",
                                          NULL, flags, NULL);
     if (circa_type == NULL) return 1;
     return 0;
