@@ -4,11 +4,8 @@
          get/2,
          push/2,
          slice/3]).
--export([start/0]).
 
 -on_load(nif_init/0).
-
--include_lib("eunit/include/eunit.hrl").
 
 -define(APPNAME, ?MODULE).
 -define(LIBNAME, ?MODULE).
@@ -26,7 +23,7 @@ set(_Res, _I, _Val) -> not_loaded(?LINE).
                                    {error, not_found}.
 get(_Res, _I) -> not_loaded(?LINE).
 
--spec push(res(), pos_integer()) -> {ok, res()}.
+-spec push(res(), pos_integer()) -> ok.
 push(_Res, _Val) -> not_loaded(?LINE).
 
 -spec slice(res(), pos_integer(), pos_integer()) -> [pos_integer()].
@@ -50,14 +47,5 @@ nif_init() ->
 
 not_loaded(Line) ->
     exit({not_loaded, [{module, ?MODULE}, {line, Line}]}).
-
-start() ->
-    ok.
-%    T = circa:new(5),
-%    [circa:push(T, X) || X <- [1, 2, 3, 4]],
-%    [io:format("~snd elem: ~p", [X, circa:get(T, X)]) || X <- [1, 2, 3, 4, 5]].
-
-start_ecirca_()->
-      [?assertEqual(<<>>, ecirca:new(3))].
 
 
