@@ -45,7 +45,7 @@ new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     }
 
     circactx* ctx = enif_alloc_resource(circa_type, sizeof(circactx));
-    ctx->begin  = -1;
+    ctx->begin  = 0;
     ctx->circa  = enif_alloc(sizeof(ELEM_TYPE) * size);
     ctx->size   = size;
     ctx->filled = 0;
@@ -53,7 +53,8 @@ new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     ret = enif_make_resource(env, ctx);
     enif_release_resource(ctx);
    
-    return ret;
+    return enif_make_tuple2(env, enif_make_atom(env, "ok"), 
+                                 ret);
 }
 
 
@@ -69,14 +70,16 @@ push(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
         return enif_make_badarg(env);
     }
     
-    if (ctx->begin++ >= ctx->size) {
-        ctx->begin  = 0;
+    if (++ctx->begin >= ctx->size + 1) {
+        ctx->begin  = 1;
         ctx->filled = 1;
     }
     
-    ctx->circa[ctx->begin] = val;
+    ctx->circa[ctx->begin - 1] = val;
+    
     return enif_make_atom(env, "ok");
 }
+
 
 static ERL_NIF_TERM
 get(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
@@ -90,7 +93,7 @@ get(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     if (!enif_get_resource(env, argv[0], circa_type, (void**) &ctx)) {
         return enif_make_badarg(env);
     }
-    if (i > ctx->size) {
+    if (i > ctx->size || i == 0) {
         return enif_make_badarg(env);
     }
     if (!ctx->filled && i > ctx->begin) {
@@ -98,30 +101,57 @@ get(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
                                      enif_make_atom(env, "not_found"));
     }
     
-    if (i > ctx->begin + 1) {
-        idx = ctx->size + ctx->begin - i + 1;
+    if (i >= ctx->begin + 1) {
+        idx = ctx->size + ctx->begin - i;
     } else {
-        idx = ctx->begin - i + 1;
+        idx = ctx->begin - i;
     }
     
-    /*return enif_make_tuple2(env, enif_make_atom(env, "ok"), 
-                                 ERL_MAKE_ELEM(env, ctx->circa[idx]));*/
-    return enif_make_tuple8(env, enif_make_atom(env, "ok"), 
-                                 ERL_MAKE_ELEM(env, ctx->circa[0]),
-                                 ERL_MAKE_ELEM(env, ctx->circa[1]),
-                                 ERL_MAKE_ELEM(env, ctx->circa[2]),
-                                 ERL_MAKE_ELEM(env, ctx->circa[3]),
-                                 ERL_MAKE_ELEM(env, ctx->circa[4]),
-                                 ERL_MAKE_ELEM(env, ctx->filled),
+    return enif_make_tuple2(env, enif_make_atom(env, "ok"), 
                                  ERL_MAKE_ELEM(env, ctx->circa[idx]));
 }
+
+
+static ERL_NIF_TERM
+set(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+    circactx * ctx;
+    SIZE_TYPE i, idx;
+    ELEM_TYPE val;
+    
+    if (argc != 3 || !ERL_GET_SIZE(env, argv[1], &i) || 
+        !ERL_GET_ELEM(env, argv[2], &val)) {
+        return enif_make_badarg(env);
+    }
+    if (!enif_get_resource(env, argv[0], circa_type, (void**) &ctx)) {
+        return enif_make_badarg(env);
+    }
+    if (i > ctx->size || i == 0) {
+        return enif_make_badarg(env);
+    }
+    if (!ctx->filled && i > ctx->begin) {
+        return enif_make_tuple2(env, enif_make_atom(env, "error"), 
+                                     enif_make_atom(env, "not_found"));
+    }
+    
+    if (i >= ctx->begin + 1) {
+        idx = ctx->size + ctx->begin - i;
+    } else {
+        idx = ctx->begin - i;
+    }
+    
+    ctx->circa[idx] = val;
+    
+    return enif_make_atom(env, "ok");
+}
+
 
 //functions
 static ErlNifFunc functions[] =
 {
     {"new", 1, new},
     {"push", 2, push},
-    {"get", 2, get}
+    {"get", 2, get},
+    {"set", 3, set}
 };
 
 ERL_NIF_INIT(ecirca, functions, &load, NULL, NULL, NULL);
